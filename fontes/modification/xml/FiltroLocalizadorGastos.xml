@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<modification>
+  <id>FiltroLocalizarGastos</id>
+  <name>Filtro Localizar de Gastos</name>
+  <ecidade-version>2.3.47</ecidade-version>
+  <file path='func_selorcdotacao_aba.php'>
+    <operation>
+      <search regex="true"><![CDATA[(\$precurso\s*=\s*\"\";)]]></search>
+      <add>
+        <![CDATA[$1
+$plocalizadorgastos = "";
+]]>
+      </add>
+    </operation>
+    <operation>
+      <search regex="true"><![CDATA[(\$precurso\s*=\s*\$o58_codigo;)]]></search>
+      <add>
+        <![CDATA[$1
+     $plocalizadorgastos  = $o58_localizadorgastos;
+]]>
+      </add>
+    </operation>
+    <operation>
+      <search regex="true"><![CDATA[(camada\s*=\s*'recurso';\n*.*})]]></search>
+      <add>
+        <![CDATA[$1
+  if(document.getElementById('div_localizadorgastos').style.visibility == 'visible'){
+	objetos = document.formlocalizadorgastos.elements;
+	camada  = 'localizadorgastos';
+  }
+]]>
+      </add>
+    </operation>
+    <operation>
+      <search regex="true"><![CDATA[(objetos\s*=\s*document.formrecurso.elements;.*\n*.*js_troca\(objetos,tipoacao\);)]]></search>
+      <add>
+        <![CDATA[$1
+  objetos = document.formlocalizadorgastos.elements;
+  js_troca(objetos,tipoacao);
+]]>
+      </add>
+    </operation>
+    <operation>
+      <search regex="true"><![CDATA[(document.getElementById\('div_instit'\).*style.visibility='hidden';)]]></search>
+      <add>
+        <![CDATA[$1
+  if (tipo=="localizadorgastos") {
+	  document.getElementById('div_localizadorgastos').style.visibility = document.getElementById('div_localizadorgastos').style.visibility='visible';
+  } else {
+	  document.getElementById('div_localizadorgastos').style.visibility = document.getElementById('div_localizadorgastos').style.visibility='hidden';
+  }]]>
+      </add>
+    </operation>
+    <operation>
+      <search regex="true"><![CDATA[('des','recurso')]]></search>
+      <add>
+        <![CDATA[$1,'localizadorgastos']]>
+      </add>
+    </operation>
+    <operation>
+      <search regex="true"><![CDATA[(<input id=\"recurso\".*>)]]></search>
+      <add>
+        <![CDATA[$1
+      <input id="localizadorgastos" type="button" value="Localizador de Gastos" onclick="js_marca_orgaos('localizadorgastos');return false" >]]>
+      </add>
+    </operation>
+    <operation>
+      <search><![CDATA[<form name="forminstit" action="post">]]></search>
+      <add position="before">
+        <![CDATA[
+  <form name="formlocalizadorgastos" action="post">
+  <div id='div_localizadorgastos' style='position:absolute; visibility:hidden' >
+   <table border=1 cellspacing=0 >
+    <?
+     $sQuery  = " o58_anousu = ".db_getsession("DB_anousu")." and $sel_orgaos";
+     $result  = $clorcdotacao->sql_record($clorcdotacao->sql_query(null,null," distinct o58_localizadorgastos,ppasubtitulolocalizadorgasto.o11_descricao","o58_localizadorgastos",$sQuery));
+     for($i=0;$i<$clorcdotacao->numrows;$i++){
+       db_fieldsmemory($result,$i);
+       ?>
+       <tr>
+       <td><input type='checkbox' name='localizadorgastos_<?=$o58_localizadorgastos?>' value='<?=$o58_localizadorgastos?>' <?=($plocalizadorgastos==$o58_localizadorgastos?"checked":"")?> ></td>
+       <td  align='right'> <?=$o58_localizadorgastos?> </td>
+       <td align='left' ><strong><?=$o11_descricao?></strong></td>
+       <tr>
+       <?
+     }
+     ?>
+   </table>
+  </div>
+  </form>]]>
+      </add>
+    </operation>    
+  </file>
+  <file path='libs/db_liborcamento.php'>
+    <operation>
+      <search regex="true"><![CDATA[(var\s*\$recurso\s*=\s*null\s*;)]]></search>
+      <add>
+        <![CDATA[$1
+  var $localizadorgastos = null;
+  
+  function getDadosLocalizadorGastos() {
+  	return $this->localizadorgastos;
+  }]]>
+      </add>
+    </operation>
+    <operation>
+      <search regex="true"><![CDATA[(\$txt\s*.=\s*\".*w.o58_codigo\s*in\s*\".\$this->recurso;)]]></search>
+      <add>
+        <![CDATA[$1
+        
+      if ($this->localizadorgastos != null) {
+      	$txt .= " and w.o58_localizadorgastos in".$this->localizadorgastos;
+      }
+]]>
+      </add>
+    </operation>
+    <operation>
+      <search regex="true" limit="2"><![CDATA[((\$txt\s*.=\s*\".*?)(w.|)(o58_codigo\s*in\s*\".\$this->recurso;))]]></search>
+      <add>
+        <![CDATA[$1
+        
+      if ($this->localizadorgastos != null) {
+      	$txt .= " and $3o58_localizadorgastos in".$this->localizadorgastos;
+      }
+]]>
+      </add>
+    </operation>  
+    <operation>
+      <search regex="true" limit="2"><![CDATA[(\$txt\s*\.=\s*\"Recurso:.*\\n";)]]></search>
+      <add>
+        <![CDATA[$1
+        
+      $txt .= "Localizador Gastos: ".$this->localizadorgastos."\n";
+]]>
+      </add>
+    </operation>  
+    <operation>
+      <search regex="true"><![CDATA[(\$sele_work_recurso\s*=\s*\"\s*\(\s*\"\s*;)]]></search>
+      <add>
+        <![CDATA[$1
+    $sele_work_localizadorgastos = " ( ";]]>
+      </add>
+    </operation>
+    <operation>
+      <search regex="true"><![CDATA[(\$sepc\s*=\s*\",\";\n*\s*})]]></search>
+      <add>
+        <![CDATA[$1
+        if ($ver[0] == "localizadorgastos") {
+        	$sele_work_localizadorgastos .= $seplocg.$ver[1];
+        	$seplocg = ",";
+        }]]>
+      </add>
+    </operation>
+    <operation>
+      <search regex="true"><![CDATA[(\$sele_work_recurso\s*\.=\s*\"\)\";)]]></search>
+      <add>
+        <![CDATA[$1
+      $sele_work_localizadorgastos .= ")";]]>
+      </add>
+    </operation>
+    <operation>
+      <search regex="true"><![CDATA[(\$this->recurso\s*=\s*\$sele_work_recurso;)]]></search>
+      <add>
+        <![CDATA[$1
+    if ($seplocg != "") {
+      	$this->localizadorgastos = $sele_work_localizadorgastos;
+    }]]>
+      </add>
+    </operation>    
+  </file>  
+  
+</modification>

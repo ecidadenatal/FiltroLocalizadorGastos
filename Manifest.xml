@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest>
+  <plugin name="FiltroLocalizadorGastos" label="Filtro Localizador de Gastos" plugin-version="1.0" ecidade-version="2.3.47" id-modulo="209">
+   <id id="FiltroLocalizadorGastos"> </id>
+   <files>    
+      <file name="FiltroLocalizadorgastos.xml"    path="/modification/xml/FiltroLocalizadorGastos.xml" />
+   </files>
+
+  </plugin>
+</manifest>    
